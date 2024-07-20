@@ -1,0 +1,59 @@
+body {
+    max-width: 579px;
+    margin: auto;
+}
+h1,
+h2 {
+    text-align: center;
+}
+button#record {
+    background: transparent;
+    width: 75px;
+    height: 75px;
+    border-radius: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    cursor: pointer;
+}
+button#record:active {
+    animation: pulse 500ms infinite;
+}
+img {
+    width: 50px;
+}
+section#recording {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.grite {
+    display: none;
+    margin: 0 5px;
+}
+.grite.active {
+    display: block;
+}
+.clip {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+@keyframes pulse {
+    0% {
+        background-color: rgba(67, 0, 0, 0.5);
+    }
+    25% {
+        background-color: rgba(121, 0, 0, 0.5);
+    }
+    50% {
+        background-color: rgba(173, 0, 0, 0.5);
+    }
+    75% {
+        background-color: rgba(212, 0, 0, 0.5);
+    }
+    100% {
+        background-color: rgba(231, 0, 0, 0.5);
+    }
+}
