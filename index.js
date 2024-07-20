@@ -1,3 +1,5 @@
+const pb = new PocketBase("https://gritaria.pockethost.io");
+
 const record = document.getElementById("record");
 const stop = document.getElementById("stop");
 const soundClips = document.getElementById("sound-clips");
@@ -95,6 +97,12 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             chunks = [];
             const audioURL = window.URL.createObjectURL(blob);
             audio.src = audioURL;
+
+            // upload file to pocketbase hosting
+            const formData = new FormData();
+            formData.append("audio", blob);
+
+            pb.collection("audios").create(formData);
 
             deleteButton.onclick = (e) => {
                 let evtTgt = e.target;
