@@ -17,7 +17,7 @@ button#record {
     border: none;
     cursor: pointer;
 }
-button#record:active {
+button#record.active {
     animation: pulse 500ms infinite;
 }
 img {

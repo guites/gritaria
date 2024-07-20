@@ -15,6 +15,7 @@ function startRecording() {
     if (mediaRecorder.state === "inactive") {
         mediaRecorder.start();
         toggleSpans(true);
+        record.classList.add("active");
     }
 }
 
@@ -27,6 +28,7 @@ function stopRecording(e) {
             h1.innerText = "Coloque o dedo";
         }
         toggleSpans(false);
+        record.classList.remove("active");
         if (mediaRecorder.state === "recording") {
             mediaRecorder.stop();
         }
