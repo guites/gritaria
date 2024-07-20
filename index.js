@@ -13,6 +13,12 @@ const feed = document.getElementById("feed");
 let mediaRecorder;
 let isPressed = false;
 
+function generateDeleteHash() {
+    const array = new Uint32Array(2);
+    self.crypto.getRandomValues(array);
+    return array.join("");
+}
+
 function blockContextMenu(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -78,7 +84,7 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         window.addEventListener("mouseup", stopRecording);
         window.addEventListener("touchend", stopRecording);
 
-        mediaRecorder.onstop = (e) => {
+        mediaRecorder.onstop = async (e) => {
             const clipContainer = document.createElement("article");
             const clipLabel = document.createElement("p");
             clipLabel.classList.add("clip-label");
@@ -103,15 +109,24 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             const audioURL = window.URL.createObjectURL(blob);
             audio.src = audioURL;
 
+            const deleteHash = generateDeleteHash();
+
             // upload file to pocketbase hosting
             const formData = new FormData();
             formData.append("audio", blob);
+            formData.append("deleteHash", deleteHash);
 
-            pb.collection("audios").create(formData);
+            const createdAudio = await pb.collection("audios").create(formData);
 
             deleteButton.onclick = (e) => {
                 let evtTgt = e.target;
                 if (confirm("Deletar essa gritaria?")) {
+                    pb.collection("audios").delete(
+                        createdAudio.id,
+                        (options = {
+                            deleteHash: "123",
+                        })
+                    );
                     evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
                 }
             };
