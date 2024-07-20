@@ -62,6 +62,15 @@ function toggleSpans(show) {
     });
 }
 
+async function deleteAudio(id, deleteHash) {
+    return pb.collection("audios").delete(
+        id,
+        (options = {
+            deleteHash: deleteHash,
+        })
+    );
+}
+
 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     console.log("getUserMedia supported.");
     const constraints = { audio: true };
@@ -114,19 +123,24 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             // upload file to pocketbase hosting
             const formData = new FormData();
             formData.append("audio", blob);
-            formData.append("deleteHash", deleteHash);
 
             const createdAudio = await pb.collection("audios").create(formData);
+            await pb.collection("audio_deletehashes").create({
+                audio_id: createdAudio.id,
+                deleteHash,
+            });
 
-            deleteButton.onclick = (e) => {
+            deleteButton.onclick = async (e) => {
                 let evtTgt = e.target;
                 if (confirm("Deletar essa gritaria?")) {
-                    pb.collection("audios").delete(
+                    const deletion = await deleteAudio(
                         createdAudio.id,
-                        (options = {
-                            deleteHash: "123",
-                        })
+                        deleteHash
                     );
+                    if (!deletion) {
+                        // TODO: show error feedback
+                        // TODO: do not delete audio node
+                    }
                     evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
                 }
             };
