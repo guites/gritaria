@@ -23,7 +23,7 @@ button#record.active {
 img {
     width: 50px;
 }
-section#recording {
+section#recording div.wrapper {
     display: flex;
     justify-content: center;
     align-items: center;

@@ -1,4 +1,5 @@
-const pb = new PocketBase("https://gritaria.pockethost.io");
+const pbUrl = "https://gritaria.pockethost.io";
+const pb = new PocketBase(pbUrl);
 
 const record = document.getElementById("record");
 const stop = document.getElementById("stop");
@@ -123,3 +124,21 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
 } else {
     console.log("getUserMedia not supported on your browser!");
 }
+
+// list and search for 'audios' collection records
+const list = pb
+    .collection("audios")
+    .getList(1, 100, {
+        sort: "-created",
+    })
+    .then((list) => {
+        const ul = document.getElementById("feed");
+        list.items.forEach((file) => {
+            const audio = document.createElement("audio");
+            audio.setAttribute("controls", "");
+            audio.src = `${pbUrl}/api/files/audios/${file.id}/${file.audio}`;
+            const li = document.createElement("li");
+            li.appendChild(audio);
+            ul.appendChild(li);
+        });
+    });
