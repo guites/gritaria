@@ -12,6 +12,12 @@ const griteSpans = document.querySelectorAll(".grite");
 let mediaRecorder;
 let isPressed = false;
 
+function blockContextMenu(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+}
+
 function startRecording() {
     h1.innerText = "Mantenha pressionado";
     isPressed = true;
@@ -55,11 +61,8 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     let chunks = [];
     let onSuccess = function (stream) {
         mediaRecorder = new MediaRecorder(stream);
-        record.oncontextmenu = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        };
+        record.addEventListener("contextmenu", blockContextMenu);
+        buttImg.addEventListener("contextmenu", blockContextMenu);
         record.onmouseenter = () => {
             h1.innerText = "Aperte";
         };
