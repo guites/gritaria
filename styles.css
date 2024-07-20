@@ -43,6 +43,20 @@ section#recording div.wrapper {
     justify-content: space-around;
     align-items: center;
 }
+#feed {
+    display: flex;
+    flex-direction: column;
+}
+#feed li {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-bottom: 15px;
+}
+#feed li audio {
+    width: 100%;
+}
+
 @keyframes pulse {
     0% {
         background-color: rgba(67, 0, 0, 0.5);

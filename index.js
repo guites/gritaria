@@ -5,7 +5,6 @@ const record = document.getElementById("record");
 const stop = document.getElementById("stop");
 const soundClips = document.getElementById("sound-clips");
 const h1 = document.getElementById("h1");
-const h2 = document.getElementById("h2");
 const buttImg = document.getElementById("butt-img");
 const griteSpans = document.querySelectorAll(".grite");
 const feed = document.getElementById("feed");
@@ -163,8 +162,17 @@ function createAudioListItem(file) {
     audio.setAttribute("controls", "");
     audio.id = file.id;
     audio.src = `${pbUrl}/api/files/audios/${file.id}/${file.audio}`;
+
+    const timeTag = document.createElement("time");
+
+    const parsedDate = dateFns.parseISO(file.created);
+    timeTag.innerText = dateFns.formatDistanceToNow(parsedDate, {
+        addSuffix: true,
+        locale: dateFns.locale.ptBR,
+    });
     const li = document.createElement("li");
     li.appendChild(audio);
+    li.appendChild(timeTag);
     return li;
 }
 
