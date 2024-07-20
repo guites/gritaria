@@ -9,6 +9,31 @@ const griteSpans = document.querySelectorAll(".grite");
 let mediaRecorder;
 let isPressed = false;
 
+function startRecording() {
+    h1.innerText = "Mantenha pressionado";
+    isPressed = true;
+    if (mediaRecorder.state === "inactive") {
+        mediaRecorder.start();
+        toggleSpans(true);
+    }
+}
+
+function stopRecording(e) {
+    const target = e.target;
+    if (isPressed) {
+        if (target === record || target === buttImg) {
+            h1.innerText = "Aperte";
+        } else {
+            h1.innerText = "Coloque o dedo";
+        }
+        toggleSpans(false);
+        if (mediaRecorder.state === "recording") {
+            mediaRecorder.stop();
+        }
+        isPressed = false;
+    }
+}
+
 function toggleSpans(show) {
     griteSpans.forEach((element) => {
         if (show) {
@@ -25,7 +50,11 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     let chunks = [];
     let onSuccess = function (stream) {
         mediaRecorder = new MediaRecorder(stream);
-
+        record.oncontextmenu = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        };
         record.onmouseenter = () => {
             h1.innerText = "Aperte";
         };
@@ -34,29 +63,11 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 h1.innerText = "Coloque o dedo";
             }
         };
-        record.onmousedown = () => {
-            h1.innerText = "Mantenha pressionado";
-            isPressed = true;
-            if (mediaRecorder.state === "inactive") {
-                mediaRecorder.start();
-                toggleSpans(true);
-            }
-        };
-        window.onmouseup = (e) => {
-            const target = e.target;
-            if (isPressed) {
-                if (target === record || target === buttImg) {
-                    h1.innerText = "Aperte";
-                } else {
-                    h1.innerText = "Coloque o dedo";
-                }
-                toggleSpans(false);
-                if (mediaRecorder.state === "recording") {
-                    mediaRecorder.stop();
-                }
-                isPressed = false;
-            }
-        };
+        record.addEventListener("mousedown", startRecording);
+        record.addEventListener("touchstart", startRecording);
+
+        window.addEventListener("mouseup", stopRecording);
+        window.addEventListener("touchstop", stopRecording);
 
         mediaRecorder.onstop = (e) => {
             const clipContainer = document.createElement("article");
@@ -91,6 +102,7 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             };
         };
         mediaRecorder.ondataavailable = function (e) {
+            console.log(e);
             chunks.push(e.data);
         };
     };
