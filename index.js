@@ -67,7 +67,7 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         record.addEventListener("touchstart", startRecording);
 
         window.addEventListener("mouseup", stopRecording);
-        window.addEventListener("touchstop", stopRecording);
+        window.addEventListener("touchend", stopRecording);
 
         mediaRecorder.onstop = (e) => {
             const clipContainer = document.createElement("article");
