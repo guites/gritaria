@@ -8,6 +8,7 @@ const h1 = document.getElementById("h1");
 const h2 = document.getElementById("h2");
 const buttImg = document.getElementById("butt-img");
 const griteSpans = document.querySelectorAll(".grite");
+const feed = document.getElementById("feed");
 
 let mediaRecorder;
 let isPressed = false;
@@ -128,6 +129,15 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     console.log("getUserMedia not supported on your browser!");
 }
 
+function createAudioListItem(file) {
+    const audio = document.createElement("audio");
+    audio.setAttribute("controls", "");
+    audio.id = file.id;
+    audio.src = `${pbUrl}/api/files/audios/${file.id}/${file.audio}`;
+    const li = document.createElement("li");
+    li.appendChild(audio);
+}
+
 // list and search for 'audios' collection records
 const list = pb
     .collection("audios")
@@ -135,13 +145,22 @@ const list = pb
         sort: "-created",
     })
     .then((list) => {
-        const ul = document.getElementById("feed");
         list.items.forEach((file) => {
-            const audio = document.createElement("audio");
-            audio.setAttribute("controls", "");
-            audio.src = `${pbUrl}/api/files/audios/${file.id}/${file.audio}`;
-            const li = document.createElement("li");
-            li.appendChild(audio);
-            ul.appendChild(li);
+            const li = createAudioListItem(file);
+            feed.appendChild(li);
         });
     });
+
+pb.collection("audios").subscribe("*", function (e) {
+    console.log(e.action);
+    console.log(e.record);
+    if (e.action == "create") {
+        const li = createAudioListItem(e.record);
+        feed.prepend(li);
+    }
+    if (e.action == "delete") {
+        const audio = document.getElementById(e.record.id);
+        const li = audio.parentElement;
+        li.remove();
+    }
+});
