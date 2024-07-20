@@ -2,6 +2,10 @@ body {
     max-width: 579px;
     margin: auto;
 }
+section {
+    max-width: 95%;
+    margin: auto;
+}
 h1,
 h2 {
     text-align: center;
@@ -40,8 +44,23 @@ section#recording div.wrapper {
 }
 .clip {
     display: flex;
-    justify-content: space-around;
+    justify-content: flex-start;
     align-items: center;
+    flex-wrap: wrap;
+}
+.clip audio {
+    width: calc(100% - 95px);
+    margin-right: 10px;
+}
+.clip-label {
+    width: 100%;
+    margin-top: 0;
+}
+.delete-button {
+    display: flex;
+    font-size: 16px;
+    align-items: center;
+    cursor: pointer;
 }
 #feed {
     display: flex;
@@ -53,6 +72,7 @@ section#recording div.wrapper {
     align-items: flex-end;
     margin-bottom: 15px;
 }
+
 #feed li audio {
     width: 100%;
 }
