@@ -22,6 +22,9 @@ button#record.active {
 }
 img {
     width: 50px;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
 }
 section#recording div.wrapper {
     display: flex;
