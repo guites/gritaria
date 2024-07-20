@@ -136,6 +136,7 @@ function createAudioListItem(file) {
     audio.src = `${pbUrl}/api/files/audios/${file.id}/${file.audio}`;
     const li = document.createElement("li");
     li.appendChild(audio);
+    return li;
 }
 
 // list and search for 'audios' collection records
@@ -152,8 +153,6 @@ const list = pb
     });
 
 pb.collection("audios").subscribe("*", function (e) {
-    console.log(e.action);
-    console.log(e.record);
     if (e.action == "create") {
         const li = createAudioListItem(e.record);
         feed.prepend(li);
