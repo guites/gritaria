@@ -70,14 +70,15 @@ async function deleteAudio(id, deleteHash) {
     );
 }
 
+record.addEventListener("contextmenu", blockContextMenu);
+buttImg.addEventListener("contextmenu", blockContextMenu);
+
 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     console.log("getUserMedia supported.");
     const constraints = { audio: true };
     let chunks = [];
     let onSuccess = function (stream) {
         mediaRecorder = new MediaRecorder(stream);
-        record.addEventListener("contextmenu", blockContextMenu);
-        buttImg.addEventListener("contextmenu", blockContextMenu);
         record.onmouseenter = () => {
             h1.innerText = "Aperte";
         };
