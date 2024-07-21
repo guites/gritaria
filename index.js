@@ -11,6 +11,8 @@ const griteSpans = document.querySelectorAll(".grite");
 const feed = document.getElementById("feed");
 const feedbacks = document.getElementById("feedbacks");
 
+const persistence = new Persistence();
+
 let mediaRecorder;
 let isPressed = false;
 
@@ -76,6 +78,63 @@ async function deleteAudio(id, deleteHash) {
     );
 }
 
+function createAudioListItem(file) {
+    const audio = document.createElement("audio");
+    audio.setAttribute("controls", "");
+    audio.id = file.id;
+    audio.src = `${pbUrl}/api/files/audios/${file.id}/${file.audio}`;
+
+    const timeTag = document.createElement("time");
+
+    const parsedDate = dateFns.parseISO(file.created);
+    timeTag.innerText = dateFns.formatDistanceToNow(parsedDate, {
+        addSuffix: true,
+        locale: dateFns.locale.ptBR,
+    });
+    const li = document.createElement("li");
+    li.appendChild(audio);
+    li.appendChild(timeTag);
+    return li;
+}
+
+function createUserAudioItem() {
+    const clipContainer = document.createElement("article");
+    const clipLabel = document.createElement("p");
+    clipLabel.classList.add("clip-label");
+    const audio = document.createElement("audio");
+    const deleteButton = document.createElement("button");
+
+    clipContainer.classList.add("clip");
+    audio.setAttribute("controls", "");
+    deleteButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+  <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+</svg> Deletar`;
+    deleteButton.classList.add("delete-button");
+    const numLabels = document.querySelectorAll(".clip-label").length;
+    clipLabel.textContent = `gritaria #${numLabels + 1}`;
+
+    clipContainer.appendChild(audio);
+    clipContainer.appendChild(deleteButton);
+    clipContainer.appendChild(clipLabel);
+    soundClips.appendChild(clipContainer);
+
+    return { audio, deleteButton };
+}
+
+async function deleteBtnCallback(e, audio_id, deleteHash) {
+    let evtTgt = e.target;
+    if (confirm("Deletar essa gritaria?")) {
+        const deletion = await deleteAudio(audio_id, deleteHash);
+        if (!deletion) {
+            // TODO: show error feedback
+            // TODO: do not delete audio node
+        }
+        evtTgt.closest(".clip").remove();
+        // remove from localStorage
+        persistence.rmAudio(audio_id);
+    }
+}
+
 record.addEventListener("contextmenu", blockContextMenu);
 buttImg.addEventListener("contextmenu", blockContextMenu);
 keepPressedImg.addEventListener("contextmenu", blockContextMenu);
@@ -101,25 +160,7 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         window.addEventListener("touchend", stopRecording);
 
         mediaRecorder.onstop = async (e) => {
-            const clipContainer = document.createElement("article");
-            const clipLabel = document.createElement("p");
-            clipLabel.classList.add("clip-label");
-            const audio = document.createElement("audio");
-            const deleteButton = document.createElement("button");
-
-            clipContainer.classList.add("clip");
-            audio.setAttribute("controls", "");
-            deleteButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
-  <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
-</svg> Deletar`;
-            deleteButton.classList.add("delete-button");
-            const numLabels = document.querySelectorAll(".clip-label").length;
-            clipLabel.textContent = `gritaria #${numLabels + 1}`;
-
-            clipContainer.appendChild(audio);
-            clipContainer.appendChild(deleteButton);
-            clipContainer.appendChild(clipLabel);
-            soundClips.appendChild(clipContainer);
+            const { audio, deleteButton } = createUserAudioItem();
 
             const blob = new Blob(chunks, {
                 type: mediaRecorder.mimeType,
@@ -139,20 +180,10 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 audio_id: createdAudio.id,
                 deleteHash,
             });
+            persistence.addAudio(createdAudio.id, deleteHash);
 
             deleteButton.onclick = async (e) => {
-                let evtTgt = e.target;
-                if (confirm("Deletar essa gritaria?")) {
-                    const deletion = await deleteAudio(
-                        createdAudio.id,
-                        deleteHash
-                    );
-                    if (!deletion) {
-                        // TODO: show error feedback
-                        // TODO: do not delete audio node
-                    }
-                    evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
-                }
+                await deleteBtnCallback(e, createdAudio.id, deleteHash);
             };
         };
         mediaRecorder.ondataavailable = function (e) {
@@ -174,28 +205,31 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     console.log("getUserMedia not supported on your browser!");
 }
 
-function createAudioListItem(file) {
-    const audio = document.createElement("audio");
-    audio.setAttribute("controls", "");
-    audio.id = file.id;
-    audio.src = `${pbUrl}/api/files/audios/${file.id}/${file.audio}`;
-
-    const timeTag = document.createElement("time");
-
-    const parsedDate = dateFns.parseISO(file.created);
-    timeTag.innerText = dateFns.formatDistanceToNow(parsedDate, {
-        addSuffix: true,
-        locale: dateFns.locale.ptBR,
-    });
-    const li = document.createElement("li");
-    li.appendChild(audio);
-    li.appendChild(timeTag);
-    return li;
+// load list of user audios
+if (persistence.audios.length > 0) {
+    pb.collection("audios")
+        .getList(1, 100, {
+            requestKey: "userAudios",
+            // aka. `id="id1" || id="id2" || id="id3"`
+            filter: persistence
+                .getAudioIds()
+                .map((id) => `id="${id}"`)
+                .join("||"),
+        })
+        .then((list) => {
+            list.items.forEach((file) => {
+                const { audio, deleteButton } = createUserAudioItem();
+                audio.src = `${pbUrl}/api/files/audios/${file.id}/${file.audio}`;
+                const deleteHash = persistence.getDeleteHash(file.id);
+                deleteButton.addEventListener("click", async function (e) {
+                    await deleteBtnCallback(e, file.id, deleteHash);
+                });
+            });
+        });
 }
 
 // list and search for 'audios' collection records
-const list = pb
-    .collection("audios")
+pb.collection("audios")
     .getList(1, 100, {
         sort: "-created",
     })
