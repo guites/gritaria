@@ -6,6 +6,7 @@ const stop = document.getElementById("stop");
 const soundClips = document.getElementById("sound-clips");
 const h1 = document.getElementById("h1");
 const buttImg = document.getElementById("butt-img");
+const keepPressedImg = document.getElementById("keep-pressed");
 const griteSpans = document.querySelectorAll(".grite");
 const feed = document.getElementById("feed");
 const feedbacks = document.getElementById("feedbacks");
@@ -38,7 +39,11 @@ function startRecording() {
 function stopRecording(e) {
     const target = e.target;
     if (isPressed) {
-        if (target === record || target === buttImg) {
+        if (
+            target === record ||
+            target === buttImg ||
+            target === keepPressedImg
+        ) {
             h1.innerText = "Aperte";
         } else {
             h1.innerText = "Coloque o dedo";
@@ -73,6 +78,7 @@ async function deleteAudio(id, deleteHash) {
 
 record.addEventListener("contextmenu", blockContextMenu);
 buttImg.addEventListener("contextmenu", blockContextMenu);
+keepPressedImg.addEventListener("contextmenu", blockContextMenu);
 
 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     console.log("getUserMedia supported.");

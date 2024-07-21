@@ -23,15 +23,20 @@ button#record {
     align-items: center;
     border: none;
     cursor: pointer;
+    position: relative;
 }
 button#record.active {
     animation: pulse 500ms infinite;
 }
 img {
-    width: 50px;
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
+}
+#keep-pressed {
+    width: 100px;
+    height: auto;
+    position: absolute;
 }
 section#recording div.wrapper {
     display: flex;
@@ -78,10 +83,6 @@ section#recording div.wrapper {
 
 #feed li audio {
     width: 100%;
-}
-
-path {
-    fill: transparent;
 }
 
 .alert {
