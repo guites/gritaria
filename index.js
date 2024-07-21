@@ -8,6 +8,7 @@ const h1 = document.getElementById("h1");
 const buttImg = document.getElementById("butt-img");
 const griteSpans = document.querySelectorAll(".grite");
 const feed = document.getElementById("feed");
+const feedbacks = document.getElementById("feedbacks");
 
 let mediaRecorder;
 let isPressed = false;
@@ -155,6 +156,12 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     };
     let onError = function (err) {
         console.log("The following error occured: " + err);
+        const errorDiv = document.createElement("div");
+        errorDiv.classList.add("alert", "danger");
+        errorDiv.innerHTML =
+            "Ei! Você precisa permitir o uso do microfone pra usar o site.";
+        errorDiv.id = "navigator-mediadevices-error";
+        feedbacks.appendChild(errorDiv);
     };
     navigator.mediaDevices.getUserMedia(constraints).then(onSuccess, onError);
 } else {

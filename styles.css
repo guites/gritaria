@@ -6,6 +6,9 @@ section {
     max-width: 95%;
     margin: auto;
 }
+section:first-child {
+    margin-top: 35px;
+}
 h1,
 h2 {
     text-align: center;
@@ -75,6 +78,24 @@ section#recording div.wrapper {
 
 #feed li audio {
     width: 100%;
+}
+
+path {
+    fill: transparent;
+}
+
+.alert {
+    position: relative;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+}
+
+.alert.danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
 }
 
 @keyframes pulse {
